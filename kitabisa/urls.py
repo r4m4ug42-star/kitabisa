@@ -1,15 +1,15 @@
+# kitabisa/urls.py
 from django.contrib import admin
 from django.urls import path, include
-from django.shortcuts import redirect  # tambah ini
-from django.conf import settings
-from django.conf.urls.static import static
+from django.http import HttpResponse
 
 urlpatterns = [
     path('admin/', admin.site.urls),
 
-    # 👉 ROOT URL (INI KUNCI NYA)
-    path('', lambda request: redirect('daftar_kursus')),
+    # Debug URL ping → pasti jalan
+    path('ping/', lambda request: HttpResponse("OK")),
 
+    # Sertakan semua URL app kitajalan di bawah root
     path('', include('kitajalan.urls')),
 ]
 

@@ -1,44 +1,50 @@
-from django.urls import path, include
-from . import views
+#from django.urls import path, include
+#from . import views
+from django.shortcuts import redirect
+from django.http import HttpResponse
+
 
 urlpatterns = [
+
+    # ROOT → redirect ke kursus
+    #path('', lambda request: redirect('daftar_kursus')),
+    #path('ping/', lambda request: HttpResponse("OK")),
 
     # =====================
     # HOME
     # =====================
-    path('kursus/', views.daftar_kursus, name='daftar_kursus'),
+    #path('kursus/', views.daftar_kursus, name='daftar_kursus'),
+
+    #path('', views.daftar_kursus, name='daftar_kursus'),
+    #path('kursus/', views.daftar_kursus, name='daftar_kursus_alt'),
 
     # =====================
     # DEBUG (optional)
     # =====================
     path('debug/<slug:kursus_slug>/', views.daftar_materi, name='debug_daftar_materi'),
 
-    path('debug/<slug:kursus_slug>/<slug:materi_slug>/', 
+    path('debug/<slug:kursus_slug>/<slug:materi_slug>/',
          views.daftar_materi, name='debug_materi_detail'),
 
-    path('debug/<slug:kursus_slug>/<slug:materi_slug>/halaman/<slug:halaman_slug>/', 
+    path('debug/<slug:kursus_slug>/<slug:materi_slug>/halaman/<slug:halaman_slug>/',
          views.halaman_detail_slug, name='debug_halaman_detail'),
 
     # =====================
     # MAIN ROUTES
     # =====================
 
-    # Halaman detail (paling spesifik)
     path('kursus/<slug:kursus_slug>/<slug:materi_slug>/halaman/<slug:halaman_slug>/',
          views.halaman_detail_slug,
          name='halaman_detail'),
 
-    # Materi detail
     path('kursus/<slug:kursus_slug>/<slug:materi_slug>/',
          views.daftar_halaman,
          name='materi_detail'),
 
-    # Enroll
     path('kursus/<slug:kursus_slug>/enroll/',
          views.enroll_kursus,
          name='enroll_kursus'),
 
-    # Daftar materi
     path('kursus/<slug:kursus_slug>/',
          views.daftar_materi,
          name='daftar_materi'),
