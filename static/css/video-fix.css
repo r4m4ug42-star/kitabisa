@@ -1,0 +1,106 @@
+/* ====================================
+   VIDEO FIX - PRIORITAS TINGGI
+   ==================================== */
+
+/* Target semua kemungkinan container video */
+.video-container,
+.video-wrapper,
+.blok-video,
+[class*="video"] {
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow: hidden !important;
+    position: relative !important;
+    box-sizing: border-box !important;
+}
+
+/* Force semua iframe video */
+iframe[src*="youtube"],
+iframe[src*="youtu.be"],
+iframe[src*="youtube-nocookie"] {
+    width: 100% !important;
+    max-width: 100% !important;
+    height: auto !important;
+    min-height: 300px;
+    display: block !important;
+    border: 0 !important;
+}
+
+/* Aspect ratio container */
+.video-wrapper {
+    position: relative !important;
+    padding-bottom: 56.25% !important; /* 16:9 */
+    height: 0 !important;
+    overflow: hidden !important;
+    background: #000 !important;
+    border-radius: 12px !important;
+    margin: 20px 0 !important;
+}
+
+.video-wrapper iframe {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    border: 0 !important;
+}
+
+/* Container utama konten */
+.lesson-content {
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow-x: hidden !important;
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+.lesson-content > * {
+    max-width: 100% !important;
+}
+
+/* Content wrapper */
+.content-wrapper {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 20px !important;
+    box-sizing: border-box !important;
+}
+
+/* Main content */
+.main-content {
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow-x: hidden !important;
+    padding: 20px !important;
+    box-sizing: border-box !important;
+}
+
+/* Reset semua margin/padding yang mungkin menyebabkan overflow */
+* {
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+/* Fix untuk gambar dan elemen lain */
+img, video, object, embed {
+    max-width: 100% !important;
+    height: auto !important;
+}
+
+/* Debug - untuk melihat batas container */
+.main-content {
+    border: 2px solid red !important; /* Sementara untuk debugging */
+}
+
+.content-wrapper {
+    border: 2px solid blue !important; /* Sementara untuk debugging */
+}
+
+.lesson-content {
+    border: 2px solid green !important; /* Sementara untuk debugging */
+}
+
+.video-container {
+    border: 2px solid orange !important; /* Sementara untuk debugging */
+}

@@ -1,0 +1,144 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Debug - {{ kursus.nama }}{% endblock %}
+
+{% block content %}
+<div style="padding: 30px; background: #f8f9fa; min-height: 80vh;">
+    <div style="background: white; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+        <h1 style="color: #2c3e50;">{{ kursus.nama }}</h1>
+        
+        {% if debug_mode %}
+        <p style="color: #7f8c8d;">
+            Debug Mode | 
+            Materi: {{ materi_list|length }} | 
+            {% if halaman_aktif %}
+                Halaman Aktif: {{ halaman_aktif.judul }}
+            {% else %}
+                Pilih halaman dari sidebar
+            {% endif %}
+        </p>
+        {% endif %}
+    </div>
+    
+    <div style="display: grid; grid-template-columns: 300px 1fr; gap: 20px;">
+        <!-- Sidebar -->
+        <div style="background: white; padding: 15px; border-radius: 8px; height: fit-content;">
+            <h3 style="margin-bottom: 15px;">Daftar Materi</h3>
+            {% for materi in materi_list %}
+                <div style="margin-bottom: 15px; padding: 10px; {% if materi.id == materi_aktif.id %}background: #e3f2fd; border-radius: 6px;{% endif %}">
+                    <strong style="display: block; margin-bottom: 8px;">{{ materi.judul }}</strong>
+                    {% for halaman in materi.halaman.all %}
+                        <div style="margin-left: 15px; margin-bottom: 5px;">
+                 		<a href="{% url 'debug_halaman_detail' kursus.slug materi.slug halaman.slug %}" 
+                               class="btn btn-sm btn-success">
+                                Buka Halaman
+                            </a>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% empty %}
+                <p>Tidak ada materi</p>
+            {% endfor %}
+        </div>
+        
+        <!-- Konten -->
+        <div style="background: white; padding: 20px; border-radius: 8px;">
+            {% if halaman_aktif %}
+                <h2>{{ halaman_aktif.judul }}</h2>
+                <hr>
+                <div style="line-height: 1.6;">
+                    {% for blok in blok_list %}
+                        <div style="margin-bottom: 20px;">
+                            {% if blok.tipe == 'text' %}
+                                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
+                                    {{ blok.render_konten|safe }}
+                                </div>
+                            {% elif blok.tipe == 'video' %}
+                                <div style="background: #000; border-radius: 8px; overflow: hidden; margin: 20px 0;">
+                                    {{ blok.render_konten|safe }}
+                                </div>
+                            {% elif blok.tipe == 'image' %}
+                                <div style="text-align: center;">
+                                    <img src="{{ blok.konten }}" style="max-width: 100%; border-radius: 8px;">
+                                </div>
+                            {% elif blok.tipe == 'code' %}
+                                <pre style="background: #1e1e1e; color: #d4d4d4; padding: 15px; border-radius: 8px; overflow-x: auto;"><code>{{ blok.konten }}</code></pre>
+                            {% else %}
+                                <div style="background: #fff3e0; padding: 10px; border-left: 4px solid #ff9800;">
+                                    <strong>Tipe: {{ blok.tipe }}</strong><br>
+                                    {{ blok.konten }}
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% empty %}
+                        <div style="text-align: center; padding: 60px 20px; background: #f8f9fa; border-radius: 8px;">
+                            <i class="fas fa-file-alt" style="font-size: 48px; color: #b0bec5; margin-bottom: 15px;"></i>
+                            <h3 style="color: #546e7a;">Konten Belum Tersedia</h3>
+                            <p style="color: #78909c;">Halaman ini belum memiliki konten.</p>
+                        </div>
+                    {% endfor %}
+                </div>
+                
+                <!-- Navigasi -->
+                <div style="display: flex; justify-content: space-between; margin-top: 30px; padding-top: 20px; border-top: 1px solid #e0e0e0;">
+                    {% if prev_halaman %}
+                        <a href="{% url 'debug_halaman_detail' kursus.slug materi_aktif.slug prev_halaman.slug %}" 
+                           class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left"></i> Sebelumnya
+                        </a>
+                    {% else %}
+                        <span></span>
+                    {% endif %}
+                    
+                    {% if next_halaman %}
+                        <a href="{% url 'debug_halaman_detail' kursus.slug materi_aktif.slug next_halaman.slug %}" 
+                           class="btn btn-outline-secondary">
+                            Selanjutnya <i class="fas fa-arrow-right"></i>
+                        </a>
+                    {% else %}
+                        <a href="{% url 'debug_daftar_materi' kursus.slug %}" 
+                           style="padding: 8px 16px; background: #4CAF50; color: white; border-radius: 4px; text-decoration: none;">
+                            Selesai →
+                        </a>
+                    {% endif %}
+                </div>
+                
+            {% else %}
+                <div style="text-align: center; padding: 60px 20px; background: #f8f9fa; border-radius: 8px;">
+                    <i class="fas fa-hand-pointer" style="font-size: 48px; color: #b0bec5; margin-bottom: 15px;"></i>
+                    <h3 style="color: #546e7a;">Pilih Materi</h3>
+                    <p style="color: #78909c;">Silakan pilih materi dari sidebar untuk mulai belajar.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    {% comment %}
+    <!-- DEBUG INFO - Disabled -->
+    	{% if debug_mode %}
+    		<div style="margin-top: 30px; background: #263238; color: #fff; padding: 20px; border-radius: 8px; font-family: monospace;">
+        		<h4 style="color: #ff9800; margin-bottom: 15px;">Debug Info</h4>
+        		<pre style="color: #a5d6ff; overflow-x: auto;">
+				Kursus: {{ kursus.nama }} ({{ kursus.slug }})
+				Materi Aktif: {{ materi_aktif.judul|default:'None' }} ({{ materi_aktif.slug|default:'None' }})
+				Halaman Aktif: {{ halaman_aktif.judul|default:'None' }} ({{ halaman_aktif.slug|default:'None' }})
+				Total Blok: {{ blok_list|length }}
+				Prev Halaman: {{ prev_halaman.judul|default:'None' }}
+				Next Halaman: {{ next_halaman.judul|default:'None' }}
+				Progress: {{ total_selesai }}/{{ total_halaman }} ({{ progress_percent }}%)
+        		</pre>
+    		</div>
+    	
+		<!-- DEBUG KUIS -->
+		<div style="background: #ff0; padding: 10px; margin: 10px 0;">
+    			<h4>DEBUG KUIS</h4>
+    			<p>User: {{ user.username }}</p>
+    			<p>Materi aktif: {{ materi_aktif.judul }}</p>
+    			<p>can_take_quiz: {{ user|can_take_quiz:materi_aktif }}</p>
+    			<p>Progress kuis: {{ user|get_progress_kuis:materi_aktif }}</p>
+		</div>
+	{% endif %}
+    {% endcomment %}
+</div>
+{% endblock %}

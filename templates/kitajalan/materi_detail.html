@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ materi.judul }}{% endblock %}
+
+{% block content %}
+<h2>{{ materi.judul }}</h2>
+<p><em>Kursus: {{ kursus.nama }}</em></p>
+
+{% if user.is_authenticated %}
+    <div class="progress-info">
+        {% if user.is_authenticated %}
+		<div class="progress-wrapper">
+    			<p><strong>Progress:</strong> {{ progress_percent }}%</p>
+
+    			<div class="progress-bar-bg">
+        			<div class="progress-bar-fill"
+             				style="width: {{ progress_percent }}%;">
+        			</div>
+    			</div>
+
+    			<p>{{ total_selesai }} / {{ total_halaman }} halaman selesai</p>
+		</div>
+	{% endif %}
+
+    </div>
+{% endif %}
+
+<hr>
+
+{% if halaman_pertama %}
+    <p>
+        <a href="{% url 'halaman_detail_slug' kursus.slug materi.slug halaman_pertama.slug %}">
+            ▶ Mulai Materi
+        </a>
+    </p>
+{% else %}
+    <p><em>Materi ini belum memiliki halaman.</em></p>
+{% endif %}
+
+<hr>
+
+<hr>
+
+<div>
+
+{% if materi_sebelumnya %}
+	<a href="{% url 'materi_detail' kursus.slug materi_sebelumnya.slug %}">
+    		← Materi Sebelumnya
+	</a>
+{% endif %}
+
+{% if materi_berikutnya %}
+	<a href="{% url 'materi_detail' kursus.slug materi_berikutnya.slug %}" style="float:right;">
+    		Materi Selanjutnya →
+	</a>
+{% else %}
+	<span style="float:right; color:green;">
+   		 ✓ Materi terakhir
+	</span>
+{% endif %}
+
+</div>
+
+<h3>Daftar Halaman</h3>
+<ul>
+    {% for h in halaman_list %}
+        <li>
+            <a href="{% url 'halaman_detail_slug' kursus.slug materi.slug h.slug %}">
+                {{ h.judul }}
+            </a>
+        </li>
+    {% empty %}
+        <li>Belum ada halaman</li>
+    {% endfor %}
+</ul>
+
+<hr>
+
+<form method="post" action="{% url 'tandai_selesai' materi.id %}">
+    {% csrf_token %}
+    <button type="submit">✔ Tandai Materi Selesai</button>
+</form>
+
+<hr>
+
+<a href="{% url 'daftar_materi' kursus.slug %}">⬅ Kembali ke Daftar Materi</a>
+{% endblock %}

@@ -1,0 +1,241 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Daftar Kursus - KitaBisa{% endblock %}
+
+{% block extra_css %}
+<style>
+    .hero-section {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 60px 0;
+        margin-bottom: 40px;
+        text-align: center;
+    }
+    
+    .hero-section h1 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 20px;
+    }
+    
+    .hero-section p {
+        font-size: 1.2rem;
+        opacity: 0.9;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+    
+    .kursus-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 24px;
+        padding: 20px 0;
+    }
+    
+    .kursus-card {
+        background: white;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        transition: transform 0.3s, box-shadow 0.3s;
+        border: 1px solid #e9ecef;
+    }
+    
+    .kursus-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+    }
+    
+    .kursus-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 20px;
+        position: relative;
+    }
+    
+    .kursus-header h3 {
+        margin: 0;
+        font-size: 1.25rem;
+        font-weight: 600;
+    }
+    
+    .kursus-header .badge {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+    }
+    
+    .kursus-body {
+        padding: 20px;
+    }
+    
+    .kursus-description {
+        color: #6c757d;
+        margin-bottom: 20px;
+        line-height: 1.6;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+    
+    .progress-info {
+        margin: 15px 0;
+        font-size: 0.9rem;
+        color: #2c3e50;
+    }
+    
+    .progress-info i {
+        margin-right: 5px;
+        color: #3498db;
+    }
+    
+    .btn-enroll {
+        width: 100%;
+        padding: 10px;
+        border: none;
+        border-radius: 6px;
+        font-weight: 500;
+        transition: all 0.3s;
+    }
+    
+    .btn-enroll.enrolled {
+        background: #28a745;
+        color: white;
+        cursor: default;
+    }
+    
+    .btn-enroll:not(.enrolled) {
+        background: #3498db;
+        color: white;
+    }
+    
+    .btn-enroll:not(.enrolled):hover {
+        background: #2980b9;
+    }
+    
+    .btn-enroll i {
+        margin-right: 5px;
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        background: white;
+        border-radius: 12px;
+        border: 2px dashed #dee2e6;
+    }
+    
+    .empty-state i {
+        font-size: 4rem;
+        color: #adb5bd;
+        margin-bottom: 20px;
+    }
+    
+    .empty-state h3 {
+        color: #495057;
+        margin-bottom: 10px;
+    }
+    
+    .empty-state p {
+        color: #6c757d;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="hero-section">
+    <div class="container">
+        <h1>Selamat Datang di KitaBisa</h1>
+        <p>Platform belajar online untuk meningkatkan skill dan pengetahuan Anda</p>
+    </div>
+</div>
+
+<div class="container">
+    <!-- Stats -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Total Kursus</h5>
+                    <h2>{{ kursus_list|length }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Kursus Diikuti</h5>
+                    <h2>{{ enrolled_kursus|length }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Progress Rata-rata</h5>
+                    <h2>{{ avg_progress|default:'0' }}%</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Daftar Kursus -->
+    <h2 class="mb-4">Semua Kursus</h2>
+    
+    {% if kursus_list %}
+        <div class="kursus-grid">
+            {% for kursus in kursus_list %}
+                <div class="kursus-card">
+                    <div class="kursus-header">
+                        <h3>{{ kursus.nama }}</h3>
+                        {% if kursus.id in enrolled_kursus %}
+                            <span class="badge bg-success">Terdaftar</span>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="kursus-body">
+                        <p class="kursus-description">
+                            {{ kursus.deskripsi|default:'Belum ada deskripsi'|truncatewords:20 }}
+                        </p>
+                        
+                        <div class="progress-info">
+                            <i class="fas fa-book-open"></i>
+                            {{ kursus.materi.count }} Materi
+                        </div>
+                        
+                        {% if user.is_authenticated %}
+                            {% if kursus.id in enrolled_kursus %}
+                                <a href="{% url 'daftar_materi' kursus.slug %}" 
+                                   class="btn btn-primary w-100">
+                                    <i class="fas fa-play-circle"></i> Lanjut Belajar
+                                </a>
+                            {% else %}
+                                <form method="post" action="{% url 'enroll_kursus' kursus.slug %}">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn-enroll">
+                                        <i class="fas fa-user-plus"></i> Enroll Kursus
+                                    </button>
+                                </form>
+                            {% endif %}
+                        {% else %}
+                            <a href="{% url 'login' %}?next={% url 'daftar_materi' kursus.slug %}" 
+                               class="btn-enroll">
+                                <i class="fas fa-sign-in-alt"></i> Login untuk Enroll
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <i class="fas fa-book-open"></i>
+            <h3>Belum Ada Kursus</h3>
+            <p>Saat ini belum ada kursus yang tersedia. Silakan cek kembali nanti.</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,25 @@
+.lesson-content {
+    line-height: 1.7;
+    font-size: 16px;
+}
+
+.admonition {
+    padding: 1rem;
+    border-radius: 6px;
+    margin: 1rem 0;
+}
+
+.admonition.info {
+    background: #e3f2fd;
+    border-left: 5px solid #2196f3;
+}
+
+.admonition.warning {
+    background: #fff3e0;
+    border-left: 5px solid #ff9800;
+}
+
+.admonition.tip {
+    background: #e8f5e9;
+    border-left: 5px solid #4caf50;
+}

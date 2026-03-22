@@ -1,0 +1,12 @@
+<!-- lesson_detail.html -->
+<h1>{{ lesson.title }}</h1>
+
+<div class="lesson-content">
+    {{ lesson_html|safe }}
+</div>
+
+<link rel="stylesheet"
+ href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script>hljs.highlightAll();</script>

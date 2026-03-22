@@ -1,0 +1,314 @@
+/* markdown.css */
+
+/* ===============================
+   MARKDOWN CONTENT STYLES
+   =============================== */
+
+.lesson-content {
+    line-height: 1.7;
+    font-size: 16px;
+    color: #333;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+/* Headers */
+.lesson-content h1 {
+    font-size: 2.2em;
+    margin: 1.5em 0 0.8em;
+    padding-bottom: 0.3em;
+    border-bottom: 2px solid #eaecef;
+}
+
+.lesson-content h2 {
+    font-size: 1.8em;
+    margin: 1.3em 0 0.6em;
+    border-bottom: 1px solid #eaecef;
+}
+
+.lesson-content h3 {
+    font-size: 1.5em;
+    margin: 1.2em 0 0.5em;
+}
+
+.lesson-content h4 {
+    font-size: 1.3em;
+    margin: 1.1em 0 0.4em;
+}
+
+/* Paragraphs and text */
+.lesson-content p {
+    margin: 1em 0;
+    line-height: 1.8;
+}
+
+.lesson-content strong {
+    color: #2c3e50;
+}
+
+.lesson-content em {
+    color: #34495e;
+}
+
+/* Lists */
+.lesson-content ul,
+.lesson-content ol {
+    margin: 1em 0 1em 2em;
+}
+
+.lesson-content li {
+    margin: 0.5em 0;
+    line-height: 1.6;
+}
+
+.lesson-content li > ul,
+.lesson-content li > ol {
+    margin-top: 0.2em;
+    margin-bottom: 0.2em;
+}
+
+/* Blockquotes */
+.lesson-content blockquote {
+    margin: 1.5em 0;
+    padding: 0.5em 1.5em;
+    border-left: 4px solid #42b983;
+    background: #f8f9fa;
+    color: #4a4a4a;
+    font-style: italic;
+}
+
+.lesson-content blockquote p {
+    margin: 0.5em 0;
+}
+
+/* Tables */
+.lesson-content table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1.5em 0;
+    font-size: 0.95em;
+}
+
+.lesson-content th {
+    background: #f8f9fa;
+    font-weight: 600;
+    padding: 12px;
+    border: 1px solid #dee2e6;
+    text-align: left;
+}
+
+.lesson-content td {
+    padding: 10px 12px;
+    border: 1px solid #dee2e6;
+}
+
+.lesson-content tr:nth-child(even) {
+    background: #f8f9fa;
+}
+
+/* ===============================
+   ADMONITION BOXES (Info, Warning, Tip)
+   =============================== */
+
+.admonition {
+    padding: 1.2rem 1.5rem;
+    border-radius: 8px;
+    margin: 1.5rem 0;
+    position: relative;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.admonition::before {
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    margin-right: 10px;
+    font-size: 1.2em;
+}
+
+.admonition.info {
+    background: #e3f2fd;
+    border-left: 5px solid #2196f3;
+}
+
+.admonition.info::before {
+    content: "\f05a";  /* info-circle icon */
+    color: #2196f3;
+}
+
+.admonition.warning {
+    background: #fff3e0;
+    border-left: 5px solid #ff9800;
+}
+
+.admonition.warning::before {
+    content: "\f071";  /* exclamation-triangle icon */
+    color: #ff9800;
+}
+
+.admonition.tip {
+    background: #e8f5e9;
+    border-left: 5px solid #4caf50;
+}
+
+.admonition.tip::before {
+    content: "\f0eb";  /* lightbulb icon */
+    color: #4caf50;
+}
+
+.admonition p {
+    margin: 0.5rem 0;
+}
+
+.admonition p:first-child {
+    margin-top: 0;
+}
+
+.admonition p:last-child {
+    margin-bottom: 0;
+}
+
+.admonition-title {
+    font-weight: bold;
+    font-size: 1.1em;
+    margin-bottom: 0.8rem;
+}
+
+/* ===============================
+   CODE BLOCKS
+   =============================== */
+
+.lesson-content pre {
+    background: #282c34;
+    color: #abb2bf;
+    padding: 1.2rem;
+    border-radius: 8px;
+    overflow-x: auto;
+    margin: 1.5rem 0;
+    font-size: 0.9em;
+    line-height: 1.5;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.lesson-content code {
+    font-family: 'Fira Code', 'Consolas', 'Monaco', monospace;
+    font-size: 0.95em;
+}
+
+.lesson-content :not(pre) > code {
+    background: #f0f2f4;
+    color: #e01e5a;
+    padding: 0.2em 0.4em;
+    border-radius: 4px;
+    font-size: 0.9em;
+}
+
+/* Code highlighting */
+.lesson-content .codehilite {
+    background: #282c34;
+    border-radius: 8px;
+    margin: 1.5rem 0;
+    overflow-x: auto;
+}
+
+.lesson-content .codehilite pre {
+    margin: 0;
+    background: transparent;
+    box-shadow: none;
+}
+
+/* Syntax highlighting colors */
+.lesson-content .codehilite .k { color: #c678dd; }  /* keyword */
+.lesson-content .codehilite .s { color: #98c379; }  /* string */
+.lesson-content .codehilite .mi { color: #d19a66; } /* number */
+.lesson-content .codehilite .nf { color: #61afef; } /* function */
+.lesson-content .codehilite .c { color: #7f848e; font-style: italic; } /* comment */
+.lesson-content .codehilite .o { color: #56b6c2; } /* operator */
+.lesson-content .codehilite .nb { color: #e5c07b; } /* builtin */
+
+/* ===============================
+   IMAGES
+   =============================== */
+
+.lesson-content img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    margin: 1.5rem 0;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.lesson-content img + em {
+    display: block;
+    text-align: center;
+    font-size: 0.9em;
+    color: #7f8c8d;
+    margin-top: -1rem;
+}
+
+/* ===============================
+   HORIZONTAL RULES
+   =============================== */
+
+.lesson-content hr {
+    border: none;
+    border-top: 2px dashed #eaecef;
+    margin: 2.5rem 0;
+}
+
+/* ===============================
+   RESPONSIVE
+   =============================== */
+
+@media (max-width: 768px) {
+    .lesson-content {
+        font-size: 15px;
+        padding: 0 15px;
+    }
+    
+    .lesson-content h1 {
+        font-size: 1.8em;
+    }
+    
+    .lesson-content h2 {
+        font-size: 1.5em;
+    }
+    
+    .lesson-content h3 {
+        font-size: 1.3em;
+    }
+    
+    .admonition {
+        padding: 1rem;
+    }
+    
+    .lesson-content table {
+        font-size: 0.85em;
+    }
+    
+    .lesson-content th,
+    .lesson-content td {
+        padding: 8px;
+    }
+}
+
+/* Print styles */
+@media print {
+    .lesson-content {
+        color: black;
+        background: white;
+    }
+    
+    .lesson-content pre {
+        background: white;
+        border: 1px solid #ddd;
+        color: black;
+    }
+    
+    .admonition {
+        border: 1px solid #ddd;
+        box-shadow: none;
+    }
+}

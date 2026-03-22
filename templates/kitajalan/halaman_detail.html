@@ -1,0 +1,240 @@
+<!-- templates/kitajalan/halaman_detail.html -->
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ halaman_aktif.judul }} - {{ materi_aktif.judul }} - {{ kursus.nama }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-3 col-lg-2 bg-light p-3" style="min-height: 100vh;">
+            <h5 class="mb-3">{{ kursus.nama }}</h5>
+            <div class="progress mb-3" style="height: 10px;">
+                <div class="progress-bar" role="progressbar" style="width: {{ progress_percent }}%;" 
+                     aria-valuenow="{{ progress_percent }}" aria-valuemin="0" aria-valuemax="100"></div>
+            </div>
+            <p class="small">{{ total_selesai }}/{{ total_halaman }} halaman selesai</p>
+            
+            <!-- Daftar Materi dengan Accordion -->
+            <div class="accordion" id="accordionMateri">
+                {% for materi in materi_list %}
+                <div class="card mb-2">
+                    <div class="card-header p-2" id="heading{{ materi.id }}">
+                        <h6 class="mb-0">
+                            <button class="btn btn-link btn-block text-left collapsed" type="button" 
+                                    data-toggle="collapse" data-target="#collapse{{ materi.id }}">
+                                {{ materi.judul }}
+                                {% if materi.id in progress_map and progress_map|dictsort:materi.id %}
+                                    <i class="fas fa-check-circle text-success float-right"></i>
+                                {% endif %}
+                            </button>
+                        </h6>
+                    </div>
+                    <div id="collapse{{ materi.id }}" class="collapse {% if materi.id == materi_aktif.id %}show{% endif %}" 
+                         data-parent="#accordionMateri">
+                        <div class="list-group list-group-flush">
+                            {% for halaman in materi.halaman.all|dictsort:"urutan" %}
+                                <a href="{% url 'halaman_detail' kursus.slug materi.slug halaman.slug %}" 
+                                   class="list-group-item list-group-item-action py-2 {% if halaman.id == halaman_aktif.id %}active{% endif %}">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span>{{ halaman.urutan }}. {{ halaman.judul }}</span>
+                                        {% if halaman.id in progress_halaman %}
+                                            <i class="fas fa-check-circle text-success"></i>
+                                        {% endif %}
+                                    </div>
+                                </a>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        
+        <!-- Konten Utama -->
+        <div class="col-md-9 col-lg-10 p-4">
+            <!-- Breadcrumb -->
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'daftar_kursus' %}">Kursus</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'daftar_materi' kursus.slug %}">{{ kursus.nama }}</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'materi_detail' kursus.slug materi_aktif.slug %}">{{ materi_aktif.judul }}</a></li>
+                    <li class="breadcrumb-item active">{{ halaman_aktif.judul }}</li>
+                </ol>
+            </nav>
+            
+            <!-- Judul Halaman -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>{{ halaman_aktif.judul }}</h2>
+                <span class="badge badge-info">Halaman {{ halaman_aktif.urutan }} dari {{ materi_aktif.halaman.count }}</span>
+            </div>
+            
+            <!-- Konten Halaman - INI YANG DIPERBAIKI -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    {% if blok_list %}
+                        {% for blok in blok_list %}
+                            <div class="mb-4">
+                                {% if blok.tipe == 'text' %}
+                                    {# Text / Markdown #}
+                                    <div class="konten-teks">
+                                        {{ blok.render_konten|safe }}
+                                    </div>
+                                
+                                {% elif blok.tipe == 'video' %}
+                                    {# Video YouTube #}
+                                    <div class="konten-video">
+                                        {{ blok.render_konten|safe }}
+                                    </div>
+                                
+                                {% elif blok.tipe == 'local_video' %}
+                                    {# Video Lokal #}
+                                    <div class="konten-video">
+                                        <video controls class="w-100" style="border-radius:8px;">
+                                            <source src="/media/{{ blok.konten }}" type="video/mp4">
+                                            Browser Anda tidak mendukung tag video.
+                                        </video>
+                                    </div>
+                                
+                                {% elif blok.tipe == 'local_image' %}
+    				{# Gambar Lokal #}
+    					<div style="margin:20px 0; text-align:center;">
+        					{% with image_path=blok.konten %}
+            						{% if 'http://' in image_path or 'https://' in image_path %}
+                					{# Ambil path setelah /media/ #}
+                						{% with clean_path=image_path|cut:'http://127.0.0.1:8000/media/'|cut:'https://127.0.0.1:8000/media/'|cut:'/media/' %}
+                    							<img src="/media/{{ clean_path }}" 
+                         						style="max-width:100%; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,0.1);"
+                         						alt="Gambar">
+                						{% endwith %}
+            						{% else %}
+                						<img src="/media/{{ image_path }}" 
+                     						style="max-width:100%; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,0.1);"
+                     						alt="Gambar">
+            						{% endif %}
+        					{% endwith %}
+    					</div>
+                                
+                                {% elif blok.tipe == 'code' %}
+                                    {# Kode #}
+                                    <pre style="background: #f4f4f4; padding:15px; border-radius:8px; overflow-x:auto;"><code>{{ blok.konten }}</code></pre>
+                                
+                                {% else %}
+                                    {# Fallback untuk tipe lain #}
+                                    <div class="alert alert-warning">
+                                        Tipe konten "{{ blok.tipe }}" belum didukung.
+                                    </div>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="text-center py-5">
+                            <i class="fas fa-file-alt fa-4x text-muted mb-3"></i>
+                            <h4>Konten Belum Tersedia</h4>
+                            <p class="text-muted">Halaman ini belum memiliki konten.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Tombol Navigasi dan Tandai Selesai -->
+            <div class="d-flex justify-content-between align-items-center mt-4">
+                <!-- Tombol Sebelumnya -->
+                <div>
+                    {% if prev_halaman %}
+                        <a href="{% url 'halaman_detail' kursus.slug materi_aktif.slug prev_halaman.slug %}" 
+                           class="btn btn-outline-secondary btn-lg">
+                            <i class="fas fa-arrow-left"></i> Sebelumnya
+                        </a>
+                    {% else %}
+                        <button class="btn btn-outline-secondary btn-lg" disabled>
+                            <i class="fas fa-arrow-left"></i> Sebelumnya
+                        </button>
+                    {% endif %}
+                </div>
+                
+                <!-- Tombol Tandai Selesai -->
+                <div>
+                    <form method="post" action="{% url 'tandai_halaman_selesai' halaman_aktif.id %}" class="d-inline" id="formTandaiSelesai">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-lg {% if halaman_aktif.id in progress_halaman %}btn-success{% else %}btn-primary{% endif %}" 
+                                id="btnTandaiSelesai">
+                            {% if halaman_aktif.id in progress_halaman %}
+                                <i class="fas fa-check-circle"></i> Sudah Selesai
+                            {% else %}
+                                <i class="fas fa-check"></i> Tandai Selesai
+                            {% endif %}
+                        </button>
+                    </form>
+                </div>
+                
+                <!-- Tombol Selanjutnya -->
+                <div>
+                    {% if next_halaman %}
+                        <a href="{% url 'halaman_detail' kursus.slug materi_aktif.slug next_halaman.slug %}" 
+                           class="btn btn-outline-secondary btn-lg" id="btnSelanjutnya">
+                            Selanjutnya <i class="fas fa-arrow-right"></i>
+                        </a>
+                    {% else %}
+                        <a href="{% url 'materi_detail' kursus.slug materi_aktif.slug %}" 
+                           class="btn btn-outline-success btn-lg">
+                            Selesai <i class="fas fa-check-double"></i>
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const formTandaiSelesai = document.getElementById('formTandaiSelesai');
+    const btnTandaiSelesai = document.getElementById('btnTandaiSelesai');
+    
+    if (formTandaiSelesai) {
+        formTandaiSelesai.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            
+            fetch(this.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Update tombol
+                    btnTandaiSelesai.innerHTML = '<i class="fas fa-check-circle"></i> Sudah Selesai';
+                    btnTandaiSelesai.classList.remove('btn-primary');
+                    btnTandaiSelesai.classList.add('btn-success');
+                    
+                    // Redirect ke halaman selanjutnya jika ada
+                    if (data.next_halaman_slug) {
+                        setTimeout(() => {
+                            window.location.href = "{% url 'halaman_detail' kursus.slug materi_aktif.slug 'dummy' %}".replace('dummy', data.next_halaman_slug);
+                        }, 1000);
+                    }
+                    
+                    // Refresh halaman setelah 1 detik untuk update sidebar
+                    setTimeout(() => {
+                        location.reload();
+                    }, 1500);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Terjadi kesalahan. Silakan coba lagi.');
+            });
+        });
+    }
+});
+</script>
+{% endblock %}

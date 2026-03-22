@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Test - {{ kursus.nama }}{% endblock %}
+
+{% block content %}
+<div style="padding: 20px; background: #f0f0f0;">
+    <h1 style="color: red;">DEBUG MODE</h1>
+    <h2>{{ kursus.nama }}</h2>
+    
+    <h3>Materi List:</h3>
+    <ul>
+    {% for m in materi_list %}
+        <li>{{ m.judul }} - {{ m.halaman.count }} halaman</li>
+    {% empty %}
+        <li>Tidak ada materi</li>
+    {% endfor %}
+    </ul>
+    
+    {% if materi_aktif %}
+        <h3>Materi Aktif: {{ materi_aktif.judul }}</h3>
+    {% endif %}
+    
+    {% if halaman_aktif %}
+        <h3>Halaman Aktif: {{ halaman_aktif.judul }}</h3>
+        <div style="background: white; padding: 20px; border: 1px solid #ccc;">
+            {{ halaman_aktif.konten|safe }}
+        </div>
+    {% endif %}
+    
+    <pre style="background: #333; color: #fff; padding: 20px;">
+        {{ debug_info }}
+    </pre>
+</div>
+{% endblock %}

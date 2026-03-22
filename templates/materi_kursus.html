@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>{{ kursus.nama }}</h2>
+
+<ul>
+{% for m in materi %}
+    <li>
+        <a href="{% url 'materi_detail' kursus.slug m.slug %}">
+            {{ m.nama }}
+        </a>
+    </li>
+{% endfor %}
+</ul>
+
+<a href="{% url 'daftar_kursus' %}">⬅ Kembali ke Daftar Kursus</a>
+{% endblock %}

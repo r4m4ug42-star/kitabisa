@@ -1,0 +1,194 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Kuis - Soal {{ nomor }}/{{ total }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .timer-container {
+        position: sticky;
+        top: 20px;
+        z-index: 1000;
+        background: white;
+        padding: 15px;
+        border-radius: 10px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        margin-bottom: 20px;
+        text-align: center;
+    }
+    
+    .timer {
+        font-size: 3em;
+        font-weight: bold;
+        font-family: monospace;
+    }
+    
+    .timer-warning {
+        color: #dc3545;
+        animation: blink 1s infinite;
+    }
+    
+    @keyframes blink {
+        50% { opacity: 0.5; }
+    }
+    
+    .progress-timer {
+        height: 8px;
+        background: #e9ecef;
+        border-radius: 4px;
+        margin-top: 10px;
+    }
+    
+    .progress-timer-bar {
+        height: 100%;
+        background: linear-gradient(90deg, #28a745, #dc3545);
+        transition: width 1s linear;
+        border-radius: 4px;
+    }
+    
+    .info-waktu {
+        font-size: 0.9em;
+        color: #6c757d;
+        margin-top: 5px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <!-- TIMER DISPLAY - SATU UNTUK SEMUA SOAL -->
+    <div class="timer-container">
+        <div>Sisa Waktu Total (5 soal)</div>
+        <div class="timer" id="timer">05:00</div>
+        <div class="progress-timer">
+            <div class="progress-timer-bar" id="timer-progress" style="width: 100%;"></div>
+        </div>
+        <div class="info-waktu">
+            Soal {{ nomor }} dari {{ total }}
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Soal {{ nomor }}/{{ total }}</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" id="form-kuis">
+                        {% csrf_token %}
+                        <div class="mb-4">
+                            <h5>{{ soal.pertanyaan }}</h5>
+                        </div>
+                        
+                        {% for value, label in form.jawaban.field.choices %}
+                            {% if value %}
+                                <div class="form-check mb-3">
+                                    <input class="form-check-input" type="radio" 
+                                           name="{{ form.jawaban.name }}" 
+                                           id="id_{{ form.jawaban.name }}_{{ forloop.counter0 }}"
+                                           value="{{ value }}"
+                                           {% if form.jawaban.value == value %}checked{% endif %}
+                                           required>
+                                    <label class="form-check-label" for="id_{{ form.jawaban.name }}_{{ forloop.counter0 }}">
+                                        {{ label }}
+                                    </label>
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                        
+                        <div class="d-flex justify-content-between mt-4">
+                            {% if nomor > 1 %}
+                                <a href="?back=true" class="btn btn-secondary">
+                                    Sebelumnya
+                                </a>
+                            {% else %}
+                                <span></span>
+                            {% endif %}
+                            
+                            <button type="submit" class="btn btn-primary">
+                                {% if nomor == total %}
+                                    Selesai
+                                {% else %}
+                                    Selanjutnya
+                                {% endif %}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Ambil sisa waktu dari server (dalam detik)
+    let remainingSeconds = {{ sisa_waktu }};
+    const totalSeconds = {{ batas_waktu }};
+    const timerElement = document.getElementById('timer');
+    const timerProgress = document.getElementById('timer-progress');
+    const form = document.getElementById('form-kuis');
+    
+    // FLAG untuk mencegah multiple alert
+    let waktuHabisAlerted = false;
+    let timerInterval;
+    
+    // Fungsi update timer
+    function updateTimer() {
+        // Cek apakah waktu sudah habis dan belum di-alert
+        if (remainingSeconds <= 0 && !waktuHabisAlerted) {
+            waktuHabisAlerted = true;  // Set flag agar tidak alert lagi
+            
+            // Hentikan timer
+            clearInterval(timerInterval);
+            
+            // Tampilkan alert
+            alert('Waktu pengerjaan kuis habis!');
+            
+            // Submit form
+            form.submit();
+            return;
+        }
+        
+        if (remainingSeconds > 0) {
+            // Format menit:detik
+            const minutes = Math.floor(remainingSeconds / 60);
+            const seconds = remainingSeconds % 60;
+            timerElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            
+            // Update progress bar
+            const progressPercent = (remainingSeconds / totalSeconds) * 100;
+            timerProgress.style.width = progressPercent + '%';
+            
+            // Warning jika kurang dari 1 menit
+            if (remainingSeconds < 60) {
+                timerElement.classList.add('timer-warning');
+            } else {
+                timerElement.classList.remove('timer-warning');
+            }
+            
+            remainingSeconds--;
+        }
+    }
+    
+    // Mulai timer (update setiap detik)
+    timerInterval = setInterval(updateTimer, 1000);
+    
+    // Jalankan update pertama segera
+    updateTimer();
+    
+    // Cegah form dikirim ganda
+    form.addEventListener('submit', function() {
+        // Hentikan timer saat form disubmit
+        clearInterval(timerInterval);
+    });
+    
+    // Tambahkan event listener untuk sebelum halaman ditinggalkan
+    window.addEventListener('beforeunload', function() {
+        clearInterval(timerInterval);
+    });
+});
+</script>
+
+{% endblock %}

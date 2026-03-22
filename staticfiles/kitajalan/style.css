@@ -1,0 +1,302 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 40px;
+    background: #f9f9f9;
+}
+
+header h1 a {
+    text-decoration: none;
+    color: #333;
+}
+
+ul {
+    padding-left: 20px;
+}
+
+li {
+    margin-bottom: 8px;
+}
+
+.konten-materi {
+    background: #fff;
+    padding: 20px;
+    border-radius: 5px;
+}
+
+.konten-materi pre {
+    background: #1e1e1e;
+    color: #f8f8f2;
+    padding: 15px;
+    border-radius: 6px;
+    overflow-x: auto;
+}
+
+.konten-materi code {
+    font-family: Consolas, Monaco, monospace;
+    font-size: 14px;
+}
+
+.codehilite {
+    background: #1e1e1e;
+    padding: 15px;
+    border-radius: 6px;
+}
+
+.admonition {
+    padding: 1rem;
+    border-radius: 6px;
+    margin: 1rem 0;
+}
+
+.admonition.info {
+    background: #e3f2fd;
+    border-left: 5px solid #2196f3;
+}
+
+.admonition.warning {
+    background: #fff3e0;
+    border-left: 5px solid #ff9800;
+}
+
+.admonition.tip {
+    background: #e8f5e9;
+    border-left: 5px solid #4caf50;
+}
+
+pre {
+    background-color: #1e1e1e;
+    color: #f8f8f2;
+    padding: 16px;
+    border-radius: 8px;
+    overflow-x: auto;
+    font-size: 14px;
+}
+
+pre code {
+    color: #f8f8f2;
+    font-family: Consolas, Monaco, 'Courier New', monospace;
+}
+
+.layout {
+    display: flex;
+    gap: 24px;
+}
+
+.sidebar {
+    width: 260px;
+    background: #f7f7f7;
+    padding: 16px;
+    border-radius: 8px;
+}
+
+.sidebar ul {
+    list-style: none;
+    padding: 0;
+}
+
+.sidebar li {
+    margin-bottom: 8px;
+}
+
+.sidebar li a {
+    text-decoration: none;
+    color: #333;
+}
+
+.sidebar li.active a {
+    font-weight: bold;
+    color: #0d6efd;
+}
+
+.content {
+    flex: 1;
+}
+
+.active a {
+    font-weight: bold;
+    color: #0d6efd;
+}
+
+.active {
+    background: #eef3ff;
+    border-radius: 5px;
+    padding: 5px;
+}
+
+/* ===============================
+   MARKDOWN CONTENT STYLE
+   =============================== */
+
+.materi-content h1 {
+    font-size: 32px;
+    margin: 24px 0 16px;
+}
+
+.materi-content h2 {
+    font-size: 26px;
+    margin: 22px 0 14px;
+}
+
+.materi-content h3 {
+    font-size: 22px;
+    margin: 20px 0 12px;
+}
+
+.materi-content p {
+    margin: 12px 0;
+    line-height: 1.7;
+}
+
+.materi-content ul {
+    margin: 12px 0 12px 24px;
+}
+
+.materi-content li {
+    margin-bottom: 6px;
+}
+
+.materi-content pre {
+    background: #1e1e1e;
+    color: #f8f8f2;
+    padding: 16px;
+    border-radius: 8px;
+    overflow-x: auto;
+    margin: 16px 0;
+}
+
+.materi-content code {
+    font-family: Consolas, Monaco, monospace;
+    font-size: 14px;
+}
+
+.materi-content pre code {
+    background: none;
+    padding: 0;
+}
+
+/* Markdown output */
+.materi-konten {
+    color: #222;
+}
+
+/* Code block */
+.materi-konten pre {
+    background: #1e1e1e;
+    color: #f8f8f2;
+    padding: 16px;
+    border-radius: 8px;
+    overflow-x: auto;
+}
+
+/* Inline code */
+.materi-konten code {
+    color: #f8f8f2;
+}
+
+/* Pygments highlight 
+.materi-konten .codehilite span {
+    color: inherit;
+}*/
+
+
+li.locked {
+    color: #999;
+    list-style: none;
+    padding: 4px 0;
+}
+
+/* === GitHub-like code style === */
+.codehilite {
+    background: #f6f8fa;
+    border: 1px solid #d0d7de;
+    border-radius: 6px;
+    padding: 16px;
+    margin: 16px 0;
+    overflow-x: auto;
+    font-size: 14px;
+    line-height: 1.45;
+}
+
+.codehilite pre {
+    margin: 0;
+    background: none;
+}
+
+/* token colors (GitHub style) */
+.codehilite .k { color: #cf222e; font-weight: 600; }   /* keyword */
+.codehilite .s { color: #0a3069; }                     /* string */
+.codehilite .mi { color: #0550ae; }                    /* number */
+.codehilite .nf { color: #8250df; }                    /* function */
+.codehilite .c { color: #6e7781; font-style: italic; }/* comment */
+.codehilite .o { color: #cf222e; }                     /* operator */
+.codehilite .nb { color: #953800; }                    /* builtin */
+
+/* === navigations === */
+
+.nav-halaman {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    margin-top: 24px;
+}
+
+.nav-halaman .nav span {
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.nav-halaman .prev {
+    text-align: left;
+}
+
+.nav-halaman .next {
+    text-align: right;
+}
+
+
+.nav-halaman {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    margin-top: 30px;
+}
+
+.nav-halaman .nav {
+    flex: 1;
+    padding: 12px 16px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background: #f8f8f8;
+    text-decoration: none;
+    color: #333;
+    font-size: 14px;
+}
+
+.back-link {
+    display: inline-block;
+    margin-bottom: 20px;
+    font-size: 13px;
+    color: #666;
+    text-decoration: none;
+}
+
+.progress-wrapper {
+    margin: 15px 0;
+}
+
+.progress-bar-bg {
+    width: 100%;
+    height: 20px;
+    background: #e0e0e0;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #4caf50, #2e7d32);
+    transition: width 0.4s ease;
+}
+

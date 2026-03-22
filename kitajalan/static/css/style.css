@@ -1,0 +1,206 @@
+/* ===============================
+   YOUTUBE VIDEO STYLES
+   =============================== */
+
+.blok-video {
+    margin: 20px 0;
+    position: relative;
+}
+
+.video-wrapper {
+    position: relative;
+    padding-bottom: 56.25%; /* 16:9 aspect ratio */
+    height: 0;
+    overflow: hidden;
+    max-width: 100%;
+    background: #000;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.video-wrapper iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+
+/* Loading state */
+.video-wrapper.loading {
+    background: linear-gradient(110deg, #ececec 8%, #f5f5f5 18%, #ececec 33%);
+    background-size: 200% 100%;
+    animation: shine 1.5s linear infinite;
+}
+
+@keyframes shine {
+    to { background-position-x: -200%; }
+}
+
+/* Video error styling */
+.video-error {
+    background: #fff3f3;
+    border: 1px solid #ffcdd2;
+    border-radius: 8px;
+    padding: 20px;
+    margin: 20px 0;
+    color: #b71c1c;
+    text-align: center;
+}
+
+.video-error a {
+    color: #b71c1c;
+    font-weight: bold;
+}
+
+.video-error button {
+    background: #ef5350;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+.video-error button:hover {
+    background: #e53935;
+}
+
+/* Fallback link */
+.video-fallback {
+    text-align: center;
+    margin-top: 10px;
+}
+
+.video-fallback .btn {
+    display: inline-block;
+    padding: 8px 16px;
+    background: #f0f0f0;
+    border: 1px solid #ddd;
+    text-decoration: none;
+    color: #333;
+    border-radius: 4px;
+    transition: all 0.3s;
+}
+
+.video-fallback .btn:hover {
+    background: #e4e4e4;
+    border-color: #ccc;
+}
+
+/* Video block spacing */
+.blok-video + .blok-video {
+    margin-top: 30px;
+}
+
+/* Responsive video */
+@media (max-width: 768px) {
+    .video-wrapper {
+        border-radius: 6px;
+    }
+    
+    .video-error {
+        padding: 15px;
+        margin: 15px 0;
+    }
+}
+
+/* Optional: Add play button overlay */
+.video-wrapper.has-thumbnail {
+    cursor: pointer;
+}
+
+.video-wrapper.has-thumbnail::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 68px;
+    height: 48px;
+    background: rgba(0,0,0,0.7);
+    border-radius: 14px;
+    pointer-events: none;
+}
+
+.video-wrapper.has-thumbnail::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-40%, -50%);
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 12px 0 12px 20px;
+    border-color: transparent transparent transparent white;
+    z-index: 2;
+    pointer-events: none;
+}
+
+/* Progress indicator di sidebar */
+.sidebar .progress-info {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #ddd;
+    font-size: 0.9em;
+    color: #666;
+}
+
+.sidebar .progress-info strong {
+    color: #333;
+}
+
+/* Status icons di sidebar */
+.sidebar li span.status-icon {
+    display: inline-block;
+    width: 20px;
+    text-align: center;
+}
+
+.sidebar li span.completed {
+    color: #28a745;
+}
+
+.sidebar li span.pending {
+    color: #999;
+}
+
+/* Active page highlight */
+.sidebar li.active-page {
+    background: #eef3ff;
+    border-radius: 5px;
+    font-weight: bold;
+}
+
+.sidebar li.active-page a {
+    color: #0d6efd;
+}
+
+/* Di style.css atau di dalam tag style */
+pre {
+    background: #f4f4f4;
+    border: 1px solid #ddd;
+    border-left: 3px solid #f36d33;
+    color: #666;
+    page-break-inside: avoid;
+    font-family: monospace;
+    font-size: 15px;
+    line-height: 1.6;
+    margin-bottom: 1.6em;
+    max-width: 100%;
+    overflow: auto;
+    padding: 1em 1.5em;
+    display: block;
+    word-wrap: break-word;
+    border-radius: 5px;
+}
+
+code {
+    background: #f4f4f4;
+    padding: 2px 4px;
+    border-radius: 3px;
+    font-family: monospace;
+}

@@ -1,0 +1,128 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">Dashboard Saya</h2>
+
+    {% if data %}
+        <div class="row">
+            {% for item in data %}
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body">
+                            <!-- Judul Kursus -->
+                            <h5 class="card-title fw-bold">{{ item.kursus.nama }}</h5>
+                            
+                            <!-- Info Progress -->
+                            <p class="card-text text-muted small mb-2">
+                                {{ item.selesai }} / {{ item.total_materi }} materi selesai
+                                ({{ item.progress }}%)
+                            </p>
+
+                            <!-- Progress Bar -->
+                            <div class="progress mb-3" style="height: 10px;">
+                                <div class="progress-bar 
+                                    {% if item.progress == 100 %}bg-success{% else %}bg-primary{% endif %}"
+                                    style="width: {{ item.progress }}%;"
+                                    role="progressbar">
+                                </div>
+                            </div>
+
+                            <!-- Badge dan Tombol Sertifikat -->
+                            {% if item.progress == 100 %}
+                                <p class="text-success mb-2">
+                                    <i class="fas fa-check-circle"></i> Selesai 🎉
+                                </p>
+                                <a href="{% url 'download_sertifikat' item.kursus.slug %}"
+                                   class="btn btn-sm btn-outline-success mb-2">
+                                   <i class="fas fa-certificate"></i> Download Sertifikat
+                                </a>
+                                <br>
+                            {% endif %}
+
+                            <!-- Tombol Kuis Final jika semua materi selesai -->
+                            {% if item.selesai == item.total_materi and item.total_materi > 0 %}
+                                <a href="{% url 'mulai_kuis_final' item.kursus.slug %}"
+                                   class="btn btn-sm btn-warning mb-2">
+                                   <i class="fas fa-pencil-alt"></i> Ikuti Final Test
+                                </a>
+                                <br>
+                            {% endif %}
+
+                            <!-- Tombol Lanjut Belajar -->
+                            {% if item.materi_pertama %}
+                                <a href="{% url 'materi_detail' item.kursus.slug item.materi_pertama.slug %}"
+                                   class="btn btn-sm btn-primary">
+                                   <i class="fas fa-play"></i> 
+                                   {% if item.progress == 0 %}
+                                       Mulai Belajar
+                                   {% elif item.progress == 100 %}
+                                       Lihat Materi
+                                   {% else %}
+                                       Lanjut Belajar
+                                   {% endif %}
+                                </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle"></i> 
+            Belum mengikuti kursus apapun. 
+            <a href="{% url 'daftar_kursus' %}" class="alert-link">Lihat kursus yang tersedia</a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .card {
+        transition: transform 0.2s, box-shadow 0.2s;
+        border: none;
+        border-radius: 12px;
+    }
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+    }
+    .progress {
+        background-color: #e9ecef;
+        border-radius: 10px;
+    }
+    .progress-bar {
+        border-radius: 10px;
+        transition: width 0.6s ease;
+    }
+    .btn {
+        border-radius: 20px;
+        padding: 0.375rem 1rem;
+        font-size: 0.875rem;
+    }
+    .btn-sm {
+        border-radius: 15px;
+    }
+    .badge-selesai {
+        color: #28a745;
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+    }
+    .btn-sertifikat {
+        display: inline-block;
+        padding: 0.25rem 1rem;
+        background: #28a745;
+        color: white;
+        text-decoration: none;
+        border-radius: 20px;
+        font-size: 0.875rem;
+        margin-bottom: 0.5rem;
+    }
+    .btn-sertifikat:hover {
+        background: #218838;
+        color: white;
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,121 @@
+{% load static %}
+
+<div class="materi-header-content">
+    <h2>{{ halaman_aktif.judul }}</h2>
+    <div class="materi-meta">
+        <span><i class="fas fa-book-open"></i> {{ materi_aktif.judul }}</span>
+        {% if halaman_aktif.id in progress_halaman %}
+            <span class="text-success"><i class="fas fa-check-circle"></i> Selesai</span>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Konten Halaman -->
+	<!-- ... bagian lain ... -->
+
+<!-- Konten Halaman -->
+<article class="lesson-content">
+	{% for blok in blok_list %}
+    <div class="mb-4">
+        {% if blok.tipe == 'video' %}
+            {# Video YouTube #}
+            {{ blok.render_konten|safe }}
+            
+        {% elif blok.tipe == 'local_video' %}
+            {# ===== VIDEO LOKAL - PLAYER LANGSUNG ===== #}
+            <div style="margin:20px 0; padding:15px; background:#f8f9fa; border-radius:8px;">
+                <video controls style="width:100%; border-radius:8px; background:#000;">
+                    <source src="/media/{{ blok.konten }}" type="video/mp4">
+                    Browser tidak mendukung video.
+                </video>
+                <p style="margin-top:10px; font-size:12px; text-align:right;">
+                    <a href="/media/{{ blok.konten }}" download>Download</a>
+                </p>
+            </div>
+            
+        {% elif blok.tipe == 'local_image' %}
+            {# Gambar Lokal #}
+            <div style="text-align:center;">
+                <img src="/media/{{ blok.konten }}" style="max-width:100%; border-radius:8px;">
+            </div>
+            
+        {% else %}
+            {# Text, Code, Image, dll #}
+            {{ blok.render_konten|safe }}
+        {% endif %}
+    </div>
+{% empty %}
+    <div class="empty-halaman">
+        <i class="fas fa-file-alt"></i>
+        <h4>Konten Belum Tersedia</h4>
+        <p>Halaman ini belum memiliki konten.</p>
+    </div>
+{% endfor %}    
+</article>
+
+<!-- ... bagian lain ... -->
+
+<!-- Navigasi dan Tombol Selesai -->
+<div class="d-flex justify-content-between align-items-center mt-5 pt-4 border-top">
+    <div>
+        {% if prev_halaman %}
+            <a href="#" onclick="loadHalaman('{{ kursus.slug }}', '{{ materi_aktif.slug }}', '{{ prev_halaman.slug }}'); return false;" 
+               class="btn btn-outline-primary">
+                <i class="fas fa-arrow-left me-2"></i>
+                {{ prev_halaman.judul|truncatechars:30 }}
+            </a>
+        {% endif %}
+    </div>
+    
+    <div>
+        {% if halaman_aktif.id not in progress_halaman %}
+            <form method="post" action="{% url 'tandai_halaman_selesai' halaman_aktif.id %}" 
+                  style="display: inline;" 
+                  onsubmit="event.preventDefault(); tandaiSelesai({{ halaman_aktif.id }});">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-success">
+                    <i class="fas fa-check me-2"></i>Tandai Selesai
+                </button>
+            </form>
+        {% endif %}
+        
+        {% if next_halaman %}
+            <a href="#" onclick="loadHalaman('{{ kursus.slug }}', '{{ materi_aktif.slug }}', '{{ next_halaman.slug }}'); return false;" 
+               class="btn btn-primary ms-2">
+                {{ next_halaman.judul|truncatechars:30 }}
+                <i class="fas fa-arrow-right ms-2"></i>
+            </a>
+        {% else %}
+            <a href="{% url 'daftar_materi' kursus.slug %}" 
+               class="btn btn-success ms-2">
+                <i class="fas fa-check-circle me-2"></i>Selesai
+            </a>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+function tandaiSelesai(halamanId) {
+    fetch(`/halaman/${halamanId}/selesai/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}',
+            'Content-Type': 'application/x-www-form-urlencoded',
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Reload halaman untuk update status
+            loadHalaman('{{ kursus.slug }}', '{{ materi_aktif.slug }}', '{{ halaman_aktif.slug }}');
+            
+            // Update icon di sidebar
+            const activeLink = document.querySelector(`.halaman-item.active i`);
+            if (activeLink) {
+                activeLink.className = 'fas fa-check-circle status-done';
+            }
+        }
+    })
+    .catch(error => console.error('Error:', error));
+}
+</script>

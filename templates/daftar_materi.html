@@ -1,0 +1,282 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load kuis_tags %}
+
+{% block title %}{{ kursus.nama }} - {{ materi_aktif.judul|default:'Materi' }}{% endblock %}
+
+{% block content %}
+
+<!-- DEBUG INFO -->
+{% if debug_mode %}
+<div style="background: #f0f0f0; padding: 20px; margin: 20px; border: 2px solid red;">
+    <h3>DEBUG INFO</h3>
+    <pre>
+Kursus: {{ kursus.nama }} ({{ kursus.slug }})
+Materi Aktif: {{ materi_aktif.judul|default:'None' }}
+Halaman Aktif: {{ halaman_aktif.judul|default:'None' }}
+Total Blok: {{ blok_list|length }}
+
+Blok List:
+{% for blok in blok_list %}
+  - {{ blok.tipe }}: {{ blok.konten|truncatechars:50 }}
+{% empty %}
+  TIDAK ADA BLOK!
+{% endfor %}
+    </pre>
+</div>
+{% endif %}
+
+<!-- Main Content -->
+<div style="padding: 30px; background: #f8f9fa; min-height: 80vh;">
+    <!-- Header -->
+    <div style="background: white; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+        <h1 style="color: #2c3e50;">
+            <a href="{% url 'daftar_materi' kursus.slug %}" style="color: #2c3e50; text-decoration: none;">
+                {{ kursus.nama }}
+            </a>
+        </h1>
+        <p style="color: #7f8c8d;">
+            {% if debug_mode %}Debug Mode | {% endif %}
+            Materi: {{ materi_list|length }} | 
+            {% if halaman_aktif %}
+                Halaman Aktif: {{ halaman_aktif.judul }}
+            {% else %}
+                Pilih halaman dari sidebar
+            {% endif %}
+        </p>
+    </div>
+    
+    <!-- Layout 2 Kolom -->
+    <div style="display: grid; grid-template-columns: 300px 1fr; gap: 20px;">
+        <!-- Sidebar -->
+        <div style="background: white; padding: 15px; border-radius: 8px; height: fit-content;">
+            <h3 style="margin-bottom: 15px;">Daftar Materi</h3>
+            
+            <!-- Progress Info -->
+            <div class="progress-info mb-3">
+                <div class="progress" style="height: 10px;">
+                    <div class="progress-bar bg-success" role="progressbar" 
+                         style="width: {{ progress_percent }}%;" 
+                         aria-valuenow="{{ progress_percent }}" aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+                <small class="text-muted">{{ total_selesai }}/{{ total_halaman }} halaman selesai ({{ progress_percent }}%)</small>
+            </div>
+            
+            <!-- Daftar Materi -->
+            {% for materi in materi_list %}
+                <div style="margin-bottom: 15px; padding: 10px; {% if materi.id == materi_aktif.id %}background: #e3f2fd; border-radius: 6px;{% endif %}">
+                    <!-- Judul Materi (bisa diklik) -->
+                    <a href="{% url 'materi_detail' kursus.slug materi.slug %}" 
+                       style="text-decoration: none; color: inherit;">
+                        <strong style="display: block; margin-bottom: 8px;">
+                            {{ materi.judul }}
+                            {% if materi.id in progress_map and progress_map|dictsort:materi.id %}
+                                <i class="fas fa-check-circle text-success float-right"></i>
+                            {% endif %}
+                        </strong>
+                    </a>
+                    
+                    <!-- Daftar halaman dalam materi - HANYA SATU LOOP -->
+                    {% for halaman in materi.halaman.all|dictsort:"urutan" %}
+                        {% with can_access=user|can_access_halaman:halaman %}
+                            <div style="margin-left: 15px; margin-bottom: 5px;">
+                                <a href="{% if can_access %}{% url 'halaman_detail' kursus.slug materi.slug halaman.slug %}{% else %}#{% endif %}" 
+                                   style="text-decoration: none; display: block; padding: 5px 8px; border-radius: 4px; 
+                                          {% if not can_access %}color: #999; cursor: not-allowed;{% endif %}
+                                          {% if halaman.id == halaman_aktif.id %}background: #007bff; color: white;{% endif %}">
+                                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                                        <span>
+                                            {% if halaman.id in progress_halaman %}✅{% else %}
+                                                {% if can_access %}○{% else %}🔒{% endif %}
+                                            {% endif %}
+                                            {{ halaman.urutan }}. {{ halaman.judul }}
+                                            {% if not can_access %} (terkunci){% endif %}
+                                        </span>
+                                        {% if halaman.id in progress_halaman %}
+                                            <i class="fas fa-check-circle" style="color: {% if halaman.id == halaman_aktif.id %}white{% else %}green{% endif %};"></i>
+                                        {% endif %}
+                                    </div>
+                                </a>
+                            </div>
+                        {% endwith %}
+                    {% endfor %}
+                </div>
+            {% empty %}
+                <p>Tidak ada materi</p>
+            {% endfor %}
+        </div>
+        
+        <!-- Konten Utama -->
+        <div style="background: white; padding: 20px; border-radius: 8px;">
+            {% if halaman_aktif %}
+                <!-- Breadcrumb -->
+                <nav style="margin-bottom: 20px; padding: 10px; background: #f8f9fa; border-radius: 5px;">
+                    <a href="{% url 'daftar_kursus' %}" style="color: #007bff;">Kursus</a> &gt;
+                    <a href="{% url 'daftar_materi' kursus.slug %}" style="color: #007bff;">{{ kursus.nama }}</a> &gt;
+                    <a href="{% url 'materi_detail' kursus.slug materi_aktif.slug %}" style="color: #007bff;">{{ materi_aktif.judul }}</a> &gt;
+                    <span>{{ halaman_aktif.judul }}</span>
+                </nav>
+                
+                <h2>{{ halaman_aktif.judul }}</h2>
+                <hr>
+                
+                <!-- Konten Halaman -->
+                <div style="line-height: 1.6;">
+                    {% for blok in blok_list %}
+                        <div style="margin-bottom: 20px;">
+                            {% if blok.tipe == 'text' %}
+                                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
+                                    {{ blok.render_konten|safe }}
+                                </div>
+                            
+                            {% elif blok.tipe == 'video' %}
+                                <div style="background: #000; border-radius: 8px; overflow: hidden; margin: 20px 0;">
+                                    {{ blok.render_konten|safe }}
+                                </div>
+                            
+                            {% elif blok.tipe == 'image' %}
+                                <div style="text-align: center;">
+                                    <img src="{{ blok.konten }}" style="max-width: 100%; border-radius: 8px;">
+                                </div>
+                            
+                            {% elif blok.tipe == 'code' %}
+                                <pre style="background: #1e1e1e; color: #d4d4d4; padding: 15px; border-radius: 8px; overflow-x: auto;"><code>{{ blok.konten }}</code></pre>
+                            
+                            {% elif blok.tipe == 'local_video' %}
+                                <div style="margin:20px 0;">
+                                    <video controls style="width:100%; border-radius:8px; background:#000;">
+                                        <source src="/media/{{ blok.konten }}" type="video/mp4">
+                                        Browser tidak mendukung video.
+                                    </video>
+                                </div>
+                            
+                            {% elif blok.tipe == 'local_image' %}
+                                <div style="margin:20px 0; text-align:center;">
+                                    <img src="/media/{{ blok.konten }}" style="max-width:100%; border-radius:8px;">
+                                </div>
+                            
+                            {% else %}
+                                <div style="background: #fff3e0; padding: 10px; border-left: 4px solid #ff9800;">
+                                    <strong>Tipe: {{ blok.tipe }}</strong><br>
+                                    {{ blok.konten }}
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% empty %}
+                        <div style="text-align: center; padding: 60px 20px; background: #f8f9fa; border-radius: 8px;">
+                            <i class="fas fa-file-alt" style="font-size: 48px; color: #b0bec5; margin-bottom: 15px;"></i>
+                            <h3 style="color: #546e7a;">Konten Belum Tersedia</h3>
+                            <p style="color: #78909c;">Halaman ini belum memiliki konten.</p>
+                        </div>
+                    {% endfor %}
+                </div>
+                
+                <!-- Navigasi Halaman -->
+                <div style="display: flex; justify-content: space-between; margin-top: 30px; padding-top: 20px; border-top: 1px solid #e0e0e0;">
+                    {% if prev_halaman %}
+                        <a href="{% url 'halaman_detail' kursus.slug materi_aktif.slug prev_halaman.slug %}" 
+                           class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left"></i> Sebelumnya
+                        </a>
+                    {% else %}
+                        <span></span>
+                    {% endif %}
+                    
+                    <div>
+                        {% if halaman_aktif.id not in progress_halaman %}
+                            <form method="post" action="{% url 'tandai_halaman_selesai' halaman_aktif.id %}" style="display: inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-check"></i> Tandai Selesai
+                                </button>
+                            </form>
+                        {% else %}
+                            <button class="btn btn-success" disabled>
+                                <i class="fas fa-check-circle"></i> Sudah Selesai
+                            </button>
+                        {% endif %}
+                    </div>
+                    
+                    {% if next_halaman %}
+                        <a href="{% url 'halaman_detail' kursus.slug materi_aktif.slug next_halaman.slug %}" 
+                           class="btn btn-outline-secondary">
+                            Selanjutnya <i class="fas fa-arrow-right"></i>
+                        </a>
+                    {% else %}
+                        <a href="{% url 'materi_detail' kursus.slug materi_aktif.slug %}" 
+                           class="btn btn-success">
+                            Selesai <i class="fas fa-check-double"></i>
+                        </a>
+                    {% endif %}
+                </div>
+                
+            {% else %}
+                <div style="text-align: center; padding: 60px 20px; background: #f8f9fa; border-radius: 8px;">
+                    <i class="fas fa-hand-pointer" style="font-size: 48px; color: #b0bec5; margin-bottom: 15px;"></i>
+                    <h3 style="color: #546e7a;">Pilih Materi</h3>
+                    <p style="color: #78909c;">Silakan pilih materi dari sidebar untuk mulai belajar.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- ===== TOMBOL KUIS - TAMPIL DI HALAMAN DAFTAR MATERI ===== -->
+    {% if materi_aktif and not halaman_aktif %}
+        {% with can_quiz=user|can_take_quiz:materi_aktif %}
+            {% if can_quiz %}
+                {% with progress=user|get_progress_kuis:materi_aktif %}
+                    <div style="margin-top: 30px; padding: 25px; background: #f8f9fa; border-radius: 8px; text-align: center; border: 1px solid #dee2e6;">
+                        <h3 style="color: #2c3e50; margin-bottom: 15px;">🎯 Selesaikan Materi?</h3>
+                        <p style="color: #6c757d; margin-bottom: 20px;">
+                            Setelah mempelajari semua halaman, uji pemahaman Anda dengan kuis.
+                        </p>
+                        
+                        {% if progress and progress.sudah_lulus %}
+                            <div style="color: #28a745; margin-bottom: 15px;">
+                                <i class="fas fa-check-circle"></i> 
+                                Anda sudah lulus kuis ini (Nilai: {{ progress.nilai_tertinggi }}%)
+                            </div>
+                            {% if progress.total_percobaan > 1 %}
+                                <p style="color: #6c757d; font-size: 0.9em;">
+                                    Percobaan: {{ progress.total_percobaan }}x
+                                </p>
+                            {% endif %}
+                        {% else %}
+                            <a href="{% url 'mulai_kuis' kursus.slug materi_aktif.slug %}" 
+                               class="btn btn-primary btn-lg" 
+                               style="padding: 12px 40px; font-size: 1.2em;">
+                                <i class="fas fa-pencil-alt"></i> Mulai Kuis Materi
+                            </a>
+                            {% if progress %}
+                                <p style="margin-top: 15px; color: #6c757d; font-size: 0.9em;">
+                                    Percobaan sebelumnya: {{ progress.total_percobaan }}x | 
+                                    Nilai Tertinggi: {{ progress.nilai_tertinggi }}%
+                                </p>
+                            {% endif %}
+                        {% endif %}
+                    </div>
+                {% endwith %}
+            {% endif %}
+        {% endwith %}
+    {% endif %}
+
+    <!-- Final Test Section -->
+    {% if materi_aktif == materi_list.last and not next_halaman and not halaman_aktif %}
+        {% with can_final=user|can_take_final:kursus %}
+            {% if can_final %}
+                <div style="margin-top: 30px; padding: 30px; background: linear-gradient(135deg, #667eea, #764ba2); border-radius: 12px; text-align: center; color: white;">
+                    <h2 style="color: white; margin-bottom: 15px;">🎓 Final Test</h2>
+                    <p style="color: rgba(255,255,255,0.9); margin-bottom: 20px;">
+                        Anda telah menyelesaikan semua materi! Uji pemahaman Anda dengan final test.
+                    </p>
+                    <a href="{% url 'mulai_kuis_final' kursus.slug %}" 
+                       class="btn btn-light btn-lg" 
+                       style="color: #667eea; padding: 12px 40px; font-weight: bold;">
+                        <i class="fas fa-pencil-alt"></i> Mulai Final Test
+                    </a>
+                </div>
+            {% endif %}
+        {% endwith %}
+    {% endif %}
+</div>
+{% endblock %}

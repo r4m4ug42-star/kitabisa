@@ -1,0 +1,16 @@
+{% load static %}
+
+<textarea id="markdown-editor" name="content_md">
+{{ lesson.content_md|default:'' }}
+</textarea>
+
+<link rel="stylesheet"
+ href="https://unpkg.com/easymde/dist/easymde.min.css">
+<script src="https://unpkg.com/easymde/dist/easymde.min.js"></script>
+
+<script>
+new EasyMDE({
+    element: document.getElementById("markdown-editor"),
+    spellChecker: false,
+});
+</script>

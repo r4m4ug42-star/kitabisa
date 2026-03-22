@@ -1,0 +1,353 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Hasil Kuis{% endblock %}
+
+{% block extra_css %}
+<style>
+    .hasil-container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 40px 20px;
+    }
+    
+    .hasil-card {
+        background: white;
+        border-radius: 12px;
+        padding: 30px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        text-align: center;
+    }
+    
+    .status-icon {
+        font-size: 80px;
+        margin-bottom: 20px;
+    }
+    
+    .status-lulus {
+        color: #4CAF50;
+    }
+    
+    .status-gagal {
+        color: #f44336;
+    }
+    
+    .nilai-circle {
+        width: 150px;
+        height: 150px;
+        margin: 20px auto;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2.5rem;
+        font-weight: bold;
+        color: white;
+    }
+    
+    .nilai-lulus {
+        background: linear-gradient(135deg, #4CAF50, #45a049);
+    }
+    
+    .nilai-gagal {
+        background: linear-gradient(135deg, #f44336, #e53935);
+    }
+    
+    .detail-nilai {
+        display: flex;
+        justify-content: center;
+        gap: 40px;
+        margin: 25px 0;
+    }
+    
+    .detail-item {
+        text-align: center;
+    }
+    
+    .detail-label {
+        color: #6c757d;
+        font-size: 0.9rem;
+        margin-bottom: 5px;
+    }
+    
+    .detail-angka {
+        font-size: 1.5rem;
+        font-weight: bold;
+    }
+    
+    .detail-benar {
+        color: #4CAF50;
+    }
+    
+    .detail-salah {
+        color: #f44336;
+    }
+    
+    .pesan {
+        font-size: 1.2rem;
+        margin: 20px 0;
+        padding: 15px;
+        border-radius: 8px;
+    }
+    
+    .pesan-lulus {
+        background: #E8F5E9;
+        color: #2E7D32;
+    }
+    
+    .pesan-gagal {
+        background: #FFEBEE;
+        color: #C62828;
+    }
+    
+    .btn-aksi {
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+        margin-top: 30px;
+        flex-wrap: wrap;
+    }
+    
+    .btn {
+        padding: 12px 30px;
+        border: none;
+        border-radius: 8px;
+        font-size: 1rem;
+        cursor: pointer;
+        text-decoration: none;
+        transition: all 0.3s;
+        display: inline-block;
+    }
+    
+    .btn-primary {
+        background: #2196F3;
+        color: white;
+    }
+    
+    .btn-primary:hover {
+        background: #1976D2;
+    }
+    
+    .btn-success {
+        background: #4CAF50;
+        color: white;
+    }
+    
+    .btn-success:hover {
+        background: #45a049;
+    }
+    
+    .btn-secondary {
+        background: #6c757d;
+        color: white;
+    }
+    
+    .btn-secondary:hover {
+        background: #5a6268;
+    }
+    
+    .btn-warning {
+        background: #ff9800;
+        color: white;
+    }
+    
+    .btn-warning:hover {
+        background: #f57c00;
+    }
+    
+    .jawaban-list {
+        margin-top: 30px;
+        text-align: left;
+    }
+    
+    .jawaban-item {
+        padding: 15px;
+        margin-bottom: 10px;
+        border-radius: 8px;
+        border-left: 4px solid;
+    }
+    
+    .jawaban-benar {
+        background: #E8F5E9;
+        border-left-color: #4CAF50;
+    }
+    
+    .jawaban-salah {
+        background: #FFEBEE;
+        border-left-color: #f44336;
+    }
+    
+    .jawaban-pertanyaan {
+        font-weight: 500;
+        margin-bottom: 8px;
+    }
+    
+    .jawaban-detail {
+        font-size: 0.9rem;
+        color: #666;
+    }
+    
+    .jawaban-user {
+        margin-top: 5px;
+    }
+    
+    .jawaban-benar-text {
+        color: #4CAF50;
+        font-weight: bold;
+    }
+    
+    .jawaban-salah-text {
+        color: #f44336;
+        font-weight: bold;
+    }
+    
+    .cooldown-timer {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #ff9800;
+        margin: 10px 0;
+    }
+    
+    @media (max-width: 768px) {
+        .btn-aksi {
+            flex-direction: column;
+        }
+        
+        .btn {
+            width: 100%;
+        }
+        
+        .detail-nilai {
+            flex-direction: column;
+            gap: 15px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="hasil-container">
+    <div class="hasil-card">
+        <!-- Status Icon -->
+        <div class="status-icon {% if sesi.status == 'lulus' %}status-lulus{% else %}status-gagal{% endif %}">
+            {% if sesi.status == 'lulus' %}
+                <i class="fas fa-check-circle"></i>
+            {% else %}
+                <i class="fas fa-times-circle"></i>
+            {% endif %}
+        </div>
+        
+        <!-- Nilai Circle -->
+        <div class="nilai-circle {% if sesi.status == 'lulus' %}nilai-lulus{% else %}nilai-gagal{% endif %}">
+            {{ sesi.nilai }}%
+        </div>
+        
+        <!-- Detail Nilai -->
+        <div class="detail-nilai">
+            <div class="detail-item">
+                <div class="detail-label">Jawaban Benar</div>
+                <div class="detail-angka detail-benar">{{ total_benar }}</div>
+            </div>
+            <div class="detail-item">
+                <div class="detail-label">Jawaban Salah</div>
+                <div class="detail-angka detail-salah">{{ total_salah }}</div>
+            </div>
+            <div class="detail-item">
+                <div class="detail-label">Total Soal</div>
+                <div class="detail-angka">{{ sesi.total_soal }}</div>
+            </div>
+        </div>
+        
+        <!-- Cooldown Timer (jika dalam cooldown) -->
+        {% if dalam_cooldown %}
+        <div class="cooldown-timer" id="cooldown-timer">
+            Tunggu {{ sisa_cooldown_format }} untuk mencoba lagi
+        </div>
+        {% endif %}
+        
+        <!-- Pesan -->
+        <div class="pesan {% if sesi.status == 'lulus' %}pesan-lulus{% else %}pesan-gagal{% endif %}">
+            {{ pesan }}
+        </div>
+        
+        <!-- Tombol Aksi -->
+        <div class="btn-aksi">
+            {% if sesi.status == 'lulus' %}
+                {% if sesi.tipe == 'final' %}
+                    <a href="{% url 'dashboard' %}" class="btn btn-success">
+                        <i class="fas fa-tachometer-alt"></i> Ke Dashboard
+                    </a>
+                    <a href="{% url 'download_sertifikat' sesi.kursus.slug %}" class="btn btn-primary">
+                        <i class="fas fa-certificate"></i> Download Sertifikat
+                    </a>
+                {% else %}
+                    <a href="{% url 'materi_detail' sesi.kursus.slug sesi.materi.slug %}" class="btn btn-success">
+                        <i class="fas fa-arrow-left"></i> Kembali ke Materi
+                    </a>
+                {% endif %}
+            {% else %}
+                {% if bisa_ulang %}
+                    <a href="{% url 'mulai_kuis' sesi.kursus.slug sesi.materi.slug %}" class="btn btn-primary">
+                        <i class="fas fa-redo"></i> Coba Lagi
+                    </a>
+                    <a href="{% url 'materi_detail' sesi.kursus.slug sesi.materi.slug %}" class="btn btn-secondary">
+                        <i class="fas fa-book"></i> Pelajari Ulang
+                    </a>
+                {% else %}
+                    <a href="{% url 'materi_detail' sesi.kursus.slug sesi.materi.slug %}" class="btn btn-secondary">
+                        <i class="fas fa-book"></i> Pelajari Ulang Materi
+                    </a>
+                {% endif %}
+            {% endif %}
+        </div>
+        
+        <!-- Detail Jawaban (untuk review) -->
+        {% if sesi.status == 'gagal' %}
+        <div class="jawaban-list">
+            <h3 style="margin: 30px 0 20px;">Review Jawaban</h3>
+            {% for jawaban in jawaban_list %}
+                <div class="jawaban-item {% if jawaban.is_benar %}jawaban-benar{% else %}jawaban-salah{% endif %}">
+                    <div class="jawaban-pertanyaan">
+                        <strong>Soal {{ forloop.counter }}:</strong> {{ jawaban.soal.pertanyaan }}
+                    </div>
+                    <div class="jawaban-detail">
+                        <div>Jawaban Anda: 
+                            <span class="{% if jawaban.is_benar %}jawaban-benar-text{% else %}jawaban-salah-text{% endif %}">
+                                {{ jawaban.get_jawaban_user_display }} ({{ jawaban.jawaban_user }})
+                            </span>
+                        </div>
+                        {% if not jawaban.is_benar %}
+                            <div class="jawaban-benar-text">
+                                Jawaban Benar: {{ jawaban.soal.get_jawaban_benar_display }} ({{ jawaban.soal.jawaban_benar }})
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+{% if dalam_cooldown %}
+<script>
+    let sisaCooldown = {{ sisa_cooldown }};
+    const cooldownElement = document.getElementById('cooldown-timer');
+    
+    function updateCooldown() {
+        if (sisaCooldown <= 0) {
+            location.reload();
+            return;
+        }
+        
+        const minutes = Math.floor(sisaCooldown / 60);
+        const seconds = sisaCooldown % 60;
+        cooldownElement.textContent = `Tunggu ${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')} untuk mencoba lagi`;
+        
+        sisaCooldown--;
+    }
+    
+    setInterval(updateCooldown, 1000);
+</script>
+{% endif %}
+{% endblock %}
