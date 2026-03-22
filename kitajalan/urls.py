@@ -2,8 +2,17 @@
 
 from django.urls import path, include
 from . import views
+from django.shortcuts import redirect  # tambahkan ini
+
 
 urlpatterns = [
+    path('admin/', admin.site.urls),
+
+    # 👉 TAMBAHKAN INI (root URL)
+    path('', lambda request: redirect('daftar_kursus')),
+
+    path('', include('kitajalan.urls')),
+
     # Home
     #path('', views.daftar_kursus, name='home'),
     path('kursus/', views.daftar_kursus, name='daftar_kursus'),
